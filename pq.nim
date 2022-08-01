@@ -51,14 +51,13 @@ proc edit*[P,K](q: var PQ[P,K], prio: P, i: int, iSet: ISet[K]) =
   q.data[i][0] = prio           #XXX validate that prio < old
   q.lift 0, i, iSet             #XXX and/or do both lift & bury
 
-import std/strformat, cligen/osUt
-proc chk*[P,K](q: PQ[P,K]) =
-  let n = q.data.len
-  for i in 0 ..< n div 2:
-    if 2*i+1<n and q.data[2*i+1][0] < q.data[i][0]: erru &"[2*{i}+1] < [{i}]\n"
-    if 2*i+2<n and q.data[2*i+2][0] < q.data[i][0]: erru &"[2*{i}+2] < [{i}]\n"
-
 when isMainModule:
+  import std/strformat, cligen/osUt
+  proc chk[P,K](q: PQ[P,K]) =
+   let n = q.data.len
+   for i in 0 ..< n div 2:
+     if 2*i+1<n and q.data[2*i+1][0] < q.data[i][0]: erru &"[2*{i}+1] < [{i}]\n"
+     if 2*i+2<n and q.data[2*i+2][0] < q.data[i][0]: erru &"[2*{i}+2] < [{i}]\n"
   var idx = newSeq[int](8)
   proc iSet(k: int8, i: int) = idx[k.int] = i
   var q: PQ[float, int8]
