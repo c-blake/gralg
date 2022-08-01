@@ -10,11 +10,11 @@ edit entry priorities and `std/heapqueue` does not allow this.
 
 https://github.com/c-blake/thes has demos/tests of most of these algorithms,
 but a quick list is:
-  . arc/edge reversal
-  . topological sorting/testing for DAG/cyclicity
-  . transitive closure
-  . shortest path from beginning to end via BFS
-  . shortest path from beginning to end via Dijkstra
-  . components when viewed as an undirected graph
+  * arc/edge reversal
+  * topological sorting/testing for DAG/cyclicity
+  * transitive closure
+  * shortest path from beginning to end via BFS
+  * shortest path from beginning to end via Dijkstra
+  * components when viewed as an undirected graph
 
 Should probably grow MST, Max Flow, and weak strong components algorithms.
