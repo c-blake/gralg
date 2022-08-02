@@ -6,3 +6,5 @@ license     = "MIT/ISC"
 
 # Dependencies
 requires "nim >= 1.2.0", "cligen >= 1.5.27"
+
+installFiles = @[ "pq.nim" ]
