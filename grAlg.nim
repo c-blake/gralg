@@ -118,7 +118,7 @@ template unDirCompons*(dg; n: int; nodes, dests): untyped =
 
 template unDirComponSizes*(dg; n: int; nodes, dests): untyped =
   ## Evals to a `CountTable[int]` of component sizes.
-  var (up, _) = unDirComponIdSz(dg, n, nodes, dests)
+  var (up, _ {.used.}) = unDirComponIdSz(dg, n, nodes, dests)
   var t: CountTable[int]
   for x in nodes(dg): t.inc udcRoot(up, int(x))
   t
