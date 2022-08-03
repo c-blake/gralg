@@ -49,30 +49,30 @@ template shortestPathBFS*[I](dg; n: int; b,e: I; dests): untyped =
   var q    = initDeque[I](32)               # Nodes to check
   shortestPathBFS(dg, n, b, e, dests, did, pred, q)
 
-template shortestPathPFS*[I](dg; W:type; n: int; b,e: I; nodes, dests): untyped=
+template shortestPathPFS*[I](dg; C:type; n: int; b,e: I; nodes, dests): untyped=
   ## Dijkstra Min Cost Path Algorithm for b -> e; Unlike most other algos here,
-  ## `dests` must be compatible with `for (dest, cost: W) in dests(dg, n): ..`.
+  ## `dests` must be compatible with `for (dest, cost: C) in dests(dg, n): ..`.
   ## As with all Dijkstra, length/costs must be > 0 (but can be `float`).
   var result: seq[I]
-  var dist = newSeq[W](n)               # This uses about 12*n space
-  var pred = newSeqNoInit[I](n)         # Dijkstra Shortest Path
+  var cost = newSeq[C](n)               # This uses about 12*n space
+  var pred = newSeqNoInit[I](n)         # Dijkstra Min Cost Path
   var idx  = newSeq[I](n)               # map[x] == heap index
   if true:                              # Scope for `proc`
     proc iSet(k: I, i: int) = idx[k.int] = I(i + 1) # 0 encodes MISSING
-    var q: PrioQ[W, I]                  # Another 8*n space
+    var q: PrioQ[C, I]                  # Another 8*n space
     for i in nodes(dg):
-      dist[i] = (if i == b: W(0) else: W.high)
+      cost[i] = (if i == b: C(0) else: C.high)
       idx[i] = i + 1
-      push q, dist[i], i, iSet
+      push q, cost[i], i, iSet
     while q.len > 0:
-      let (xw, x) = q.pop(iSet)
+      let (xC, x) = q.pop(iSet)
       idx[x] = 0                        # Mark completed early to not re-do
-      if xw != W.high:                  # reachable
-        for (y, yw) in dests(dg, x):
+      if xC != C.high:                  # reachable
+        for (y, yC) in dests(dg, x):
           if idx[y] != 0:               # shortest remains undetermined
-            let alt = dist[x] + yw
-            if alt < dist[y]:
-              dist[y] = alt
+            let alt = cost[x] + yC
+            if alt < cost[y]:
+              cost[y] = alt
               pred[y] = x
               edit q, alt, idx[y] - 1, iSet
     trace pred, b, e, result            # trace path into result
