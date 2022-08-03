@@ -4,7 +4,7 @@
 ## do allocate `n`-proportional space. TODO Maybe make routines be abstract Re:
 ## nodes containing needed metadata and ref/ptr node Ids?
 #TODO Max Flow?  Other?
-import std/[deques, algorithm, tables], pq, cligen/sysUt; export tables
+import std/[deques, algorithm, tables], gaPrioQ, cligen/sysUt; export tables
 
 template reverse*(dg, nodes, dests, result): untyped =
   ## Add reverse arcs of `dg` to `result` (must have `mgetOrPut(Id, seq[Id])`).
@@ -12,9 +12,11 @@ template reverse*(dg, nodes, dests, result): untyped =
     for y in dests(dg, x):
       result.mgetOrPut(y, @[]).add x
 
+const gaMaxPath* {.intdefine.} = 10_000 # Diams even this big are very rare
+
 template trace(pred, b, e, result) =
   var p = e                             # Build path from `pred[e]` links.
-  while p != b:
+  while p != b and result.len < gaMaxPath:
     result.add p; p = pred[p]
   result.add b
   result.reverse
@@ -48,25 +50,27 @@ template shortestPathBFS*[I](dg; n: int; b,e: I; dests): untyped =
   shortestPathBFS(dg, n, b, e, dests, did, pred, q)
 
 template shortestPathPFS*[I](dg; W:type; n: int; b,e: I; nodes, dests): untyped=
-  ## Dijkstra Shortest Path Algorithm for b -> e; TODO add a wtDests() variant
+  ## Dijkstra Min Cost Path Algorithm for b -> e; Unlike most other algos here,
+  ## `dests` must be compatible with `for (dest, cost: W) in dests(dg, n): ..`.
+  ## As with all Dijkstra, length/costs must be > 0 (but can be `float`).
   var result: seq[I]
   var dist = newSeq[W](n)               # This uses about 12*n space
   var pred = newSeqNoInit[I](n)         # Dijkstra Shortest Path
   var idx  = newSeq[I](n)               # map[x] == heap index
-  if true:                              # scope for `proc`
+  if true:                              # Scope for `proc`
     proc iSet(k: I, i: int) = idx[k.int] = I(i + 1) # 0 encodes MISSING
-    var q: PQ[W, I]                     # Another 8*n space
+    var q: PrioQ[W, I]                  # Another 8*n space
     for i in nodes(dg):
       dist[i] = (if i == b: W(0) else: W.high)
       idx[i] = i + 1
       push q, dist[i], i, iSet
     while q.len > 0:
       let (xw, x) = q.pop(iSet)
-      idx[x] = 0                        # Mark completed; Q: why not after `if`?
+      idx[x] = 0                        # Mark completed early to not re-do
       if xw != W.high:                  # reachable
-        for y in dests(dg, x):          # `for (yw,y)` for more general digraphs
+        for (y, yw) in dests(dg, x):
           if idx[y] != 0:               # shortest remains undetermined
-            let alt = dist[x] + 1u32    # y weights here happen to be all 1u32
+            let alt = dist[x] + yw
             if alt < dist[y]:
               dist[y] = alt
               pred[y] = x
