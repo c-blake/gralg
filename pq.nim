@@ -1,13 +1,13 @@
 ## Dijkstra's Shortest Path edits priority.  API calls pass an `iSet` to update
 ## a K->index map.  Caller map updates on mutate allows their own GONE encoding.
 type
-  PQ*[P,K] = object                 ## A priority queue that can edit priorities
-    data*: seq[(P, K)]              # [0]=root; [--i//2]=par(i); [2*i+1|2]=kids
+  PrioQ*[P,K] = object              ## A priority queue that can edit priorities
+    data*: seq[(P, K)]              ## [0]=root; [--i//2]=par(i); [2*i+1|2]=kids
   ISet*[K] = proc(key: K, i: int)   ## Type of proc used to maintain K->i map
-proc initPQ*[P,K](): PQ[P,K]=discard ## Creates empty PQ; Empty decl also works.
-proc len*[P,K](q: PQ[P,K]): int {.inline.} = q.data.len ## Num elements in `q`.
+proc initPrioQ*[P,K](): PrioQ[P,K]=discard ## Make an empty; Just decl also ok.
+proc len*[P,K](q: PrioQ[P,K]): int{.inline.}= q.data.len ## Num elements in `q`.
 
-proc lift[P,K](q: var PQ[P,K]; i0, i: int, iSet: ISet[K]) =
+proc lift[P,K](q: var PrioQ[P,K]; i0, i: int, iSet: ISet[K]) =
   var j  = i                    # Restore heapness; Assumes `q` is a heap at all
   let it = q.data[j]            #..`j >= i0`, except for maybe out-of-order `i`.
   while j > i0:                 # Follow path to root, moving parents
@@ -19,7 +19,7 @@ proc lift[P,K](q: var PQ[P,K]; i0, i: int, iSet: ISet[K]) =
     else: break
   q.data[j] = it; iSet it[1], j
 
-proc bury[P,K](q: var PQ[P,K], i: int, iSet: ISet[K]) =
+proc bury[P,K](q: var PrioQ[P,K], i: int, iSet: ISet[K]) =
   let i0 = i
   var i  = i
   let it = q.data[i]
@@ -32,12 +32,12 @@ proc bury[P,K](q: var PQ[P,K], i: int, iSet: ISet[K]) =
   q.data[i] = it; iSet q.data[i][1], i  # [i] leaf is now empty. Put `it` there
   q.lift i0, i, iSet                    # Lift to final spot by burying parents
 
-proc push*[P,K](q: var PQ[P,K], prio: P, key: sink K, iSet: ISet[K]) =
+proc push*[P,K](q: var PrioQ[P,K], prio: P, key: sink K, iSet: ISet[K]) =
   ## Push `(prio,key)` onto `q`; Caller pre-adds `iSet(key, q.len)` to the map.
   q.data.add (prio, key)                # incs q.len by 1, reversed below
   q.lift 0, q.len - 1, iSet
 
-proc pop*[P,K](q: var PQ[P,K], iSet: ISet[K]): (P, K) =
+proc pop*[P,K](q: var PrioQ[P,K], iSet: ISet[K]): (P, K) =
   ## Pop & return smallest `(P,K)`; Caller post-removes from map used by `iSet`.
   let last = q.data.pop
   if q.len == 0: result = last
@@ -46,21 +46,21 @@ proc pop*[P,K](q: var PQ[P,K], iSet: ISet[K]): (P, K) =
     q.data[0] = last
     q.bury 0, iSet
 
-proc edit*[P,K](q: var PQ[P,K], prio: P, i: int, iSet: ISet[K]) =
+proc edit*[P,K](q: var PrioQ[P,K], prio: P, i: int, iSet: ISet[K]) =
   ## Alter priority for key at index `i`;  Caller does nothing with its map.
   q.data[i][0] = prio           #XXX validate that prio < old
   q.lift 0, i, iSet             #XXX and/or do both lift & bury
 
 when isMainModule:
   import std/strformat, cligen/osUt
-  proc chk[P,K](q: PQ[P,K]) =
+  proc chk[P,K](q: PrioQ[P,K]) =
    let n = q.data.len
    for i in 0 ..< n div 2:
      if 2*i+1<n and q.data[2*i+1][0] < q.data[i][0]: erru &"[2*{i}+1] < [{i}]\n"
      if 2*i+2<n and q.data[2*i+2][0] < q.data[i][0]: erru &"[2*{i}+2] < [{i}]\n"
   var idx = newSeq[int](8)
   proc iSet(k: int8, i: int) = idx[k.int] = i
-  var q: PQ[float, int8]
+  var q: PrioQ[float, int8]
   for (w,k) in [(4.0,6i8), (1.0,4i8), (9.0,5i8), (8.0,3i8),
                 (6.0,1i8), (7.0,0i8), (5.0,7i8), (3.0,2i8)]: q.push w, k, iSet
   q.chk
