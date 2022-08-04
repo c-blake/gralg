@@ -4,7 +4,7 @@ The core abstractions representing a graph are some kind of not necessarily
 dense integer-like address space, some nodes iterator on the graph and some
 edges(graph, node) iterator on the kids of a node/destinations of arcs.
 
-It also contains (also at the top level) `pq.nim` since the shortest path
+It also contains (also at the top level) `gaPrioQ.nim` since the shortest path
 algorithm made famous by Dijkstra needs a priority queue that can efficiently
 edit entry priorities and `std/heapqueue` does not allow this.
 
