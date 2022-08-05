@@ -16,5 +16,6 @@ but a quick list is:
   * shortest path from beginning to end via BFS
   * shortest path from beginning to end via Dijkstra
   * components when viewed as an undirected graph
+  * min cost spanning tree of weighted, undirected graph
 
-Should probably grow MST, Max Flow, and weak strong components algorithms.
+Should probably grow Max Flow, and weak strong components algorithms.
