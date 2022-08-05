@@ -49,10 +49,11 @@ template shortestPathBFS*[I](dg; n: int; b,e: I; dests): untyped =
   var q    = initDeque[I](32)               # Nodes to check
   shortestPathBFS(dg, n, b, e, dests, did, pred, q)
 
-template shortestPathPFS*[I](dg; C:type; n: int; b,e: I; nodes, dests): untyped=
+template shortestPathPFS*[I](dg; n: int; b,e: I; nodes, dests): untyped=
   ## Dijkstra Min Cost Path Algorithm for b -> e; Unlike most other algos here,
   ## `dests` must be compatible with `for (dest, cost: C) in dests(dg, n): ..`.
   ## As with all Dijkstra, length/costs must be > 0 (but can be `float`).
+  type C = typeof(block: (for s in nodes(dg): (for (d, c) in dests(dg, s): c)))
   var result: seq[I]
   var cost = newSeq[C](n)               # This uses about 12*n space
   var pred = newSeqNoInit[I](n)         # Dijkstra Min Cost Path
@@ -122,6 +123,27 @@ template unDirComponSizes*(dg; n: int; nodes, dests): untyped =
   var t: CountTable[int]
   for x in nodes(dg): t.inc udcRoot(up, int(x))
   t
+
+template minSpanTree*(dg; n: int; nodes, dests): untyped =
+  ## Evals to a Min Cost Spanning Tree via Kruskal's Algorithm.
+  type I = typeof(block: (for s in nodes(dg): s))
+  type C = typeof(block: (for s in nodes(dg): (for (d, c) in dests(dg, s): c)))
+  var result, arcs: seq[tuple[cost: C; src, dst: I]]
+  var up = newSeq[int](n)               # nodeId -> parent id
+  var sz = newSeq[int](n)               # nodeId -> sz
+  var nNode = 0
+  for src in nodes(dg):                 # Initialize:
+    inc nNode
+    up[src] = src; sz[src] = 1          #   parents all self & sizes all 1
+    for (dst, cost) in dests(dg, src):
+      arcs.add (cost, src, dst)         #   accumulate arcs
+  arcs.sort                             # Conditionally nsort?
+  for arc in arcs:
+    if result.len == nNode: break
+    if udcRoot(up, arc.src) != udcRoot(up, arc.dst):
+      udcJoin up, sz, arc.src, arc.dst
+      result.add arc
+  result
 
 template transClosure*[I](dg; n: int; b: I; nodes, dests): untyped =
   ## Evals to a `seq[I]` containing the transitive closure of `b` on `dg`.
