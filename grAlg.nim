@@ -125,7 +125,8 @@ template unDirComponSizes*(dg; n: int; nodes, dests): untyped =
   t
 
 template minSpanTree*(dg; n: int; nodes, dests): untyped =
-  ## Evals to a Min Cost Spanning Tree via Kruskal's Algorithm.
+  ## Evals to a Min Cost Spanning Tree via Kruskal's Algorithm.  `dests` here is
+  ## a cost/weighted-one like `shortestPathPFS`.
   type I = typeof(block: (for s in nodes(dg): s))
   type C = typeof(block: (for s in nodes(dg): (for (d, c) in dests(dg, s): c)))
   var result, arcs: seq[tuple[cost: C; src, dst: I]]
