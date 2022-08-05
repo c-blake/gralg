@@ -145,8 +145,8 @@ template minSpanTree*(dg; n: int; nodes, dests): untyped =
       result.add arc
   result
 
-template transClosure*[I](dg; n: int; b: I; nodes, dests): untyped =
-  ## Evals to a `seq[I]` containing the transitive closure of `b` on `dg`.
+template transClosure*[I](dg; n: int; r: I; nodes, dests): untyped =
+  ## Evals to a `seq[I]` containing the transitive closure of root `r` on `dg`.
   var did = newSeq[bool](n)     # Could save space with `result: HashSet[I]` or
   var result: seq[I]            #..just `seq[T].contains` for really small TCs.
   if true:                      # scope for `proc`
@@ -154,7 +154,7 @@ template transClosure*[I](dg; n: int; b: I; nodes, dests): untyped =
       result.add x; did[x] = true
       for y in dests(dg, x):
         if not did[y]: visit(y)
-    visit(b)
+    visit(r)
   result
 
 template topoSort*[I](dg; n: int; nodes, dests): untyped =
