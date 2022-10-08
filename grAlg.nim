@@ -15,7 +15,7 @@ template reverse*(dg, nodes, dests, result): untyped =
 const gaMaxPath* {.intdefine.} = 10_000 # Diams even this big are very rare
 
 template trace(pred, b, e, result) =
-  var p = e                             # Build path from `pred[e]` links.
+  var p = e                             # Trace path from `pred[e]` links.
   while p != b and result.len < gaMaxPath:
     result.add p; p = pred[p]
   result.add b
@@ -80,6 +80,7 @@ template shortestPathPFS*[I](dg; n: int; b,e: I; nodes, dests): untyped=
   result
 
 proc udcRoot*(up: var seq[int], x: int): int {.inline.} =
+  ## Find root in Union-Find U)nD)irected C)omponent algo w/path compression.
   result = x                            # Find root defined by parent == self
   while up[result] != result:
     result = up[result]
@@ -87,7 +88,8 @@ proc udcRoot*(up: var seq[int], x: int): int {.inline.} =
   while up[x] != result:                #..by doing up[all x in path] <- result
     let up0 = up[x]; up[x] = result; x = up0
 
-proc udcJoin(up, sz: var seq[int]; x, y: int) {.inline.} =
+proc udcJoin*(up, sz: var seq[int]; x, y: int) {.inline.} =
+  ## U)nD)irectedC)omponent Join (aka Union) in a Union-Find algorithm.
   let x = udcRoot(up, x)                # Join/union by size
   let y = udcRoot(up, y)
   if y != x:                            # x & y are not already joined
