@@ -53,7 +53,7 @@ template shortestPathPFS*[I](dg; n: int; b,e: I; nodes, dests): untyped=
   ## Dijkstra Min Cost Path Algorithm for b -> e; Unlike most other algos here,
   ## `dests` must be compatible with `for (dest, cost: C) in dests(dg, n): ..`.
   ## As with all Dijkstra, length/costs must be > 0 (but can be `float`).
-  type C = typeof(if true: (for s in nodes(dg): (for (d,c) in dests(dg, s): c)))
+  type C = typeof(for s in nodes(dg): (for (d,c) in dests(dg, s): c))
   var result: seq[I]
   var cost = newSeq[C](n)               # This uses about 12*n space
   var pred = newSeqNoInit[I](n)         # Dijkstra Min Cost Path
@@ -129,8 +129,8 @@ template unDirComponSizes*(dg; n: int; nodes, dests): untyped =
 template minSpanTree*(dg; n: int; nodes, dests): untyped =
   ## Evals to a Min Cost Spanning Tree via Kruskal's Algorithm.  `dests` here is
   ## a cost/weighted-one like `shortestPathPFS`.
-  type I = typeof(if true: (for s in nodes(dg): s))
-  type C = typeof(if true: (for s in nodes(dg): (for (d,c) in dests(dg, s): c)))
+  type I = typeof(for s in nodes(dg): s)
+  type C = typeof(for s in nodes(dg): (for (d,c) in dests(dg, s): c))
   var result, arcs: seq[tuple[cost: C; src, dst: I]]
   var up = newSeq[int](n)               # nodeId -> parent id
   var sz = newSeq[int](n)               # nodeId -> sz
