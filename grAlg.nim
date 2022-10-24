@@ -44,9 +44,9 @@ template shortestPathBFS*[I](dg; n: int; b,e: I; dests, did, pred, q): untyped =
 
 template shortestPathBFS*[I](dg; n: int; b,e: I; dests): untyped =
   ## Breadth First Search For Shortest b -> e path; Uses new mem buffers.
-  var did  = newSeqNoInit[bool](n)   # zeroed in leaf `shortestPathBFS`
+  var did  = newSeqNoInit[bool](n)      # Already zeroed in mem reusing entry pt
   var pred = newSeqNoInit[I](n)
-  var q    = initDeque[I](32)               # Nodes to check
+  var q    = initDeque[I](32)           # Nodes to check
   shortestPathBFS(dg, n, b, e, dests, did, pred, q)
 
 template shortestPathPFS*[I](dg; n: int; b,e: I; nodes, dests): untyped=
