@@ -1,4 +1,5 @@
 import tables, sets, grAlg, cligen
+when not declared(stdin): import std/syncio
 
 proc id*[T](ids: var Table[T,SomeInteger], obs: var seq[T], ob: T): SomeInteger=
   ## Get dense integer id for maybe-done `ob`, updating `ids` & `obs`. `tables`?
