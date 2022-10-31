@@ -1,3 +1,4 @@
+when not declared(assert): import std/assertions
 import grAlg
 
 let g = [ @[1,2], @[2], @[0,3], @[3]]

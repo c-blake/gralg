@@ -1,3 +1,4 @@
+when not declared(assert): import std/assertions
 import grAlg
 
 let g: seq[seq[int]] = @[ @[], @[], @[3], @[1], @[0, 1], @[2, 0] ]
