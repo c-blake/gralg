@@ -5,7 +5,7 @@ proc id*[T](ids: var Table[T,SomeInteger], obs: var seq[T], ob: T): SomeInteger=
   ## Get dense integer id for maybe-done `ob`, updating `ids` & `obs`. `tables`?
   try:
     result = ids[ob]                    # Already known => done
-  except:                               # Put into ob->id & id->ob
+  except KeyError:                      # Put into ob->id & id->ob
     result = obs.len
     ids[ob] = result
     obs.add ob
