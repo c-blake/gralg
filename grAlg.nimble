@@ -1,10 +1,10 @@
 # Package
-version     = "0.3.0"
+version     = "0.3.1"
 author      = "Charles Blake"
 description = "Classical Graph Algos in Nim"
 license     = "MIT/ISC"
 
 # Dependencies
-requires "nim >= 1.2.0", "cligen >= 1.5.27"
+requires "nim >= 1.2.0", "cligen >= 1.5.37"
 
 installFiles = @[ "gaPrioQ.nim" ]
