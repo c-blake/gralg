@@ -8,3 +8,4 @@ license     = "MIT/ISC"
 requires "nim >= 1.2.0", "cligen >= 1.5.37"
 
 installFiles = @[ "gaPrioQ.nim" ]
+bin          = @[ "util/conncomp" ]
