@@ -1,5 +1,5 @@
 # Package
-version     = "0.4.2"
+version     = "0.4.3"
 author      = "Charles Blake"
 description = "Classical Graph Algos in Nim"
 license     = "MIT/ISC"
