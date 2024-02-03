@@ -19,7 +19,7 @@ proc lift[P,K](q: var PrioQ[P,K]; i0, i: int, iSet: ISet[K]) =
     else: break
   q.data[j] = it; iSet it[1], j
 
-proc bury[P,K](q: var PrioQ[P,K], i: int, iSet: ISet[K]) =
+proc buryDeep[P,K](q: var PrioQ[P,K], i: int, iSet: ISet[K]) =
   let i0 = i
   var i  = i
   let it = q.data[i]
@@ -44,6 +44,33 @@ proc pop*[P,K](q: var PrioQ[P,K], iSet: ISet[K]): (P, K) =
   else:
     result = q.data[0]
     q.data[0] = last
+    q.buryDeep 0, iSet
+
+proc bury[P,K](q: var PrioQ[P,K], i: int, iSet: ISet[K]) =
+  var i  = i
+  let it = q.data[i]
+  while (var k1 = 2*i + 1; k1 < q.len):         # While not at a leaf node..
+    let k2 = k1 + 1                             #   k1,k2 = left,right kid
+    if k2 < q.len and not (q.data[k1][0] < q.data[k2][0]):
+      k1 = k2                                   #   make k1 = smaller kid
+    if not (q.data[k1][0] < it):
+      break
+    q.data[i] = q.data[k1]; iSet q.data[i][1], i
+    i = k1
+    k1 = 2*k1 + 1
+  q.data[i] = it; iSet q.data[i][1], i
+
+proc replace*[P,K](q: var PrioQ[P,K], prio: P, key: sink K, iSet:ISet[K]):(P,K)=
+  ## Pop & return current smallest value and push the new (prio, key) pair.
+  result = q.data[0]
+  q.data[0] = (prio, key)
+  q.bury 0, iSet
+
+proc pushpop*[P,K](q: var PrioQ[P,K], prio: P, key: sink K, iSet:ISet[K]):(P,K)=
+  ## Fast version of a `push` followed by a `pop`.
+  result = (prio, key)
+  if q.len > 0 and q.data[0] < result:
+    swap result, q.data[0]
     q.bury 0, iSet
 
 proc edit*[P,K](q: var PrioQ[P,K], prio: P, i: int, iSet: ISet[K]) =
