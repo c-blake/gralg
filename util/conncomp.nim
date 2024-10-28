@@ -36,7 +36,8 @@ proc conncomp(idelim='\t', odelim="\t", n=1024, e=4096) =
         stdout.write odelim
     stdout.write "\n"
 
-dispatch conncomp, help={"idelim": "edge delimiter",
-                         "odelim": "in-cluster delimiter",
-                         "n"     : "guess at num of unique token nodes",
-                         "e"     : "guess at num of edges"}
+include cligen/mergeCfgEnv; dispatch conncomp, help={
+  "idelim": "edge delimiter",
+  "odelim": "in-cluster delimiter",
+  "n"     : "guess at num of unique token nodes",
+  "e"     : "guess at num of edges"}
