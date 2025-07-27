@@ -6,7 +6,7 @@
 import std/[formatFloat, syncio]
 template sum0*(i, n, ex: untyped): untyped = (block:   # from fitl/basicLA
   var i{.inject.}: type(n); var tot: type(ex); (for i in 0..<n: tot += ex); tot)
-proc dot*[F](x,y:openArray[F]):F=(if x.len!=y.len:0 else:sum0(i,x.len,x[i]*y[i]))
+proc dot[F](x,y:openArray[F]):F=(if x.len!=y.len:0 else:sum0(i,x.len,x[i]*y[i]))
 type F = float; const eps = 1e-11 # `F`-precision^~2/3
 
 # Core algo is here to end of initDPlex() maker
